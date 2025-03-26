@@ -125,6 +125,10 @@ The repository includes the following JSON template files:
 
 The system is built on n8n workflow automation platform and leverages several key technologies:
 
+## Presentation
+
+For a visual overview of this system, view the presentation: [Agentic Marketing Campaign System Presentation](https://www.canva.com/design/DAGidickcMk/9uCoVHOq2xl5TT--iTZURw/view?utm_content=DAGidickcMk&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h85b38cd6d8)
+
 - **OpenAI GPT-4o**: Powers the natural language understanding and generation capabilities
 - **JSON Data Exchange**: Standardized format for communication between agents
 - **Language Detection**: Automatically identifies input language and responds accordingly

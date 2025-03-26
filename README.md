@@ -4,8 +4,6 @@
 
 This repository contains a collection of JSON workflow templates for an advanced agentic marketing campaign system built on n8n. The system orchestrates specialized AI agents to create comprehensive marketing campaigns following a structured sequence with proper data validation and multi-language support.
 
-![Agentic Marketing Campaign System](https://via.placeholder.com/800x400?text=Agentic+Marketing+Campaign+System)
-
 ## System Architecture
 
 The campaign workflow system uses a sophisticated multi-agent approach where specialized AI agents collaborate to create a complete marketing campaign. Each agent has specific expertise and responsibilities, with data flowing seamlessly between them in standardized JSON formats.
@@ -46,42 +44,49 @@ graph TD
 ### Agent Descriptions
 
 1. **Campaign Orchestrator Agent**
+
    - Coordinates the entire campaign creation process
    - Detects language of user requests and ensures responses match
    - Translates between user language and internal English processing
    - Validates inputs and outputs at each stage
 
 2. **Marketing Manager Agent**
+
    - Defines campaign objectives and target audience
    - Establishes strategic goals and key messaging
    - Creates product positioning and market analysis
    - Identifies competitive advantages and market opportunities
 
 3. **Creative Director Agent**
+
    - Develops creative concepts and brand positioning
    - Establishes visual identity guidelines
    - Uses specialized tools for brand guidelines and visual references
    - Creates cohesive creative direction across all channels
 
 4. **Graphic Designer Agent**
+
    - Creates visual mockups and design specifications
    - Develops color palettes, typography, and layout guidelines
    - Produces channel-specific design assets
    - Ensures visual consistency with brand guidelines
 
 5. **Content Creator Agent**
+
    - Develops platform-specific content ideas
    - Creates copy suggestions and content calendars
    - Ensures messaging consistency across channels
    - Optimizes content for different platforms and audiences
 
 6. **PR and Social Media Agent**
+
    - Handles media outreach strategy
    - Creates press release templates
    - Develops social media content and engagement tactics
    - Plans events and promotional activities
 
 7. **Planning Agent**
+
    - Creates detailed project timelines
    - Assigns tasks to appropriate team members
    - Establishes milestones and deadlines
@@ -216,6 +221,6 @@ This project is proprietary and confidential. Unauthorized copying, distribution
 
 ---
 
-*Created and maintained by K. Tanapol Anantachaiwanich*
+_Created and maintained by K. Tanapol Anantachaiwanich_
 
-*Last updated: March 26, 2025*
+_Last updated: March 26, 2025_

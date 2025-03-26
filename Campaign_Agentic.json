@@ -1,0 +1,973 @@
+{
+  "name": "Campaign Agentic",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Input').item.json.chat }}",
+        "options": {
+          "systemMessage": "=# Campaign Orchestrator System Prompt\n\nYou are the Campaign Orchestrator for a multi-agent marketing campaign system. Your role is to coordinate specialized AI agents to create comprehensive marketing campaigns following a strict sequence with proper data validation.\n\n## Language Handling\n\n1. DETECT the language of the user's initial request\n2. RESPOND to the user in the SAME language they used for their request\n3. ALWAYS use English for all data passed between agents (inputs/outputs)\n4. TRANSLATE final campaign deliverables back to the user's language before presentation\n5. If the user explicitly requests a different language, switch to that language for responses\n\n### CRITICAL INSTRUCTION: YOUR ENTIRE RESPONSE MUST BE VALID JSON ONLY\nDo not include any explanatory text, markdown formatting, or natural language outside the JSON structure.\nDo not prefix your response with ```json or any other markers.\nDo not include any text after the JSON.\n\n- Output: JSON object containing campaign_request (user's initial request, translated to English if necessary)\n\nToday's date is {{ $now }}."
+        }
+      },
+      "id": "803bd1b7-3107-463c-b1f5-bbe06bbb9c47",
+      "name": "Campaign Orchestrator Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        -180,
+        180
+      ],
+      "typeVersion": 1.7
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -220,
+        380
+      ],
+      "id": "1cf8b8e8-61df-47c2-8030-07de54e0bbf7",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "Ii6IZFZP8k1AKMc0",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "012jvnvpWhdwA7zO",
+          "mode": "list",
+          "cachedResultName": "Agent - Market Manager"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        640,
+        160
+      ],
+      "id": "81a60903-064c-4802-9f0a-244a62ffb8b0",
+      "name": "Marketing Manager Agent"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "8zg9a3GbKTGetzED",
+          "mode": "list",
+          "cachedResultName": "Agent - Creative Director"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        0
+      ],
+      "id": "820333b8-9ded-4f63-923d-896aed5b14c5",
+      "name": "Creative Director Agent"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "numberInputs": 3,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1120,
+        160
+      ],
+      "id": "05a34aaa-f3fd-4331-9413-049bb35d7dab",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "03skc5OpQWnVTbn2",
+          "mode": "list",
+          "cachedResultName": "Agent - Graphic Designer"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        1360,
+        40
+      ],
+      "id": "b78aa653-2445-4ec8-8e8e-0f5d962c05f5",
+      "name": "Graphic Designer Agent"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1560,
+        220
+      ],
+      "id": "8fa2c864-9d8c-42ca-b991-54508724a114",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "PrHlgqGiK2a6fkWw",
+          "mode": "list",
+          "cachedResultName": "Agent - Content Creator"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        1840,
+        40
+      ],
+      "id": "2fa8211b-dc72-490d-a71c-417b3f354b57",
+      "name": "Content Creator Agent"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "893db254-dbcf-4899-b690-90ca55acff62",
+              "name": "raw_query",
+              "value": "={{ $('Input').item.json.chat }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        380,
+        380
+      ],
+      "id": "83a0fe06-a543-4f59-8684-dec43632b743",
+      "name": "Raw Query"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ab7359f-d651-4c4d-bc77-ebf42e1be8ae",
+              "name": "campaign_request",
+              "value": "={{ $json.output.parseJson().campaign_request }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        380,
+        180
+      ],
+      "id": "f27b0688-ad6f-47b3-896d-dca42fb5db9e",
+      "name": "Set Field"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        2080,
+        220
+      ],
+      "id": "ebff4fd9-19c7-4612-921a-d2df2330d4f8",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "eLJzRByNqrlcxBeP",
+          "mode": "list",
+          "cachedResultName": "Agent - PR and Social Content"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        2280,
+        80
+      ],
+      "id": "023f750d-5d75-4781-bcf5-30f41081d962",
+      "name": "Social And Pr Agent"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "=[Marketing Documents] {{ $('Merge2').item.json.campaign_objectives.product_name }}",
+        "limit": 1,
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2820,
+        200
+      ],
+      "id": "c75a2a9a-4938-4ac2-ace1-f950780127c7",
+      "name": "Search Folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "hu9687crjhDYNqfs",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1d4b5048-d464-42fe-aa25-d6ba45d379c4",
+              "name": "output",
+              "value": "=สามารถดูเอกสารทั้งหมดได้ที่ {{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3080,
+        200
+      ],
+      "id": "cb43c62f-bd9c-4621-b1e3-ad3ae54aa978",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        2500,
+        220
+      ],
+      "id": "29d7283c-39d4-42cb-9b6a-3fe17a2ee863",
+      "name": "Merge3"
+    },
+    {
+      "parameters": {
+        "agent": "conversationalAgent",
+        "promptType": "define",
+        "text": "=Raw query:\n{{ $('Input').item.json.chat }}\n------------------------\nINPUT: \n{{ $('Merge3').item.json.toJsonString() }}",
+        "options": {
+          "systemMessage": "# Campaign Summary Agent System Prompt\n\nYou are the Campaign Summary Agent, the final agent in the marketing campaign workflow. Your role is to synthesize all outputs from previous agents into a comprehensive, user-friendly summary that provides a complete overview of the marketing campaign.\n\n## Language Handling\n\n1. DETECT the language from the raw_query field in the input data\n2. RESPOND to the user in the SAME language they used in their original request\n3. TRANSLATE all summary content to match the user's language\n4. PRESERVE brand names, product names, and technical terms in their original form\n\n## Input\n\nYou will receive a JSON object containing all outputs from previous agents in the workflow:\n\n- campaign_objectives: Core campaign goals and target audience\n- creative_concepts: Conceptual direction and messaging\n- design_assets: Visual design specifications and mockups\n- content_ideas: Platform-specific content suggestions\n- social_media_content: Platform-specific social media posts\n- pr_strategy (if available): PR and media relations plan\n- raw_query: The user's original request in their language\n\n## Process\n\n1. Analyze all components of the campaign data\n2. Identify the key strategic elements across all outputs\n3. Organize information into a cohesive, logical structure\n4. Highlight the most important aspects of each component\n5. Create a comprehensive yet concise summary\n6. Translate all content to match the user's language\n\n## Output Structure\n\nYour response should be a well-formatted document with the following sections:\n\n### 1. Executive Summary (บทสรุปผู้บริหาร)\nA brief overview of the entire campaign, highlighting key strategies and expected outcomes.\n\n### 2. Campaign Strategy (กลยุทธ์แคมเปญ)\n- Product Overview (ภาพรวมผลิตภัณฑ์)\n- Target Audience (กลุ่มเป้าหมาย)\n- Key Messaging (ข้อความหลัก)\n- Campaign Objectives (วัตถุประสงค์แคมเปญ)\n\n### 3. Creative Direction (ทิศทางความคิดสร้างสรรค์)\n- Creative Concepts (แนวคิดสร้างสรรค์)\n- Visual Identity (อัตลักษณ์ทางภาพ)\n- Design Elements (องค์ประกอบการออกแบบ)\n\n### 4. Content Strategy (กลยุทธ์เนื้อหา)\n- Content Themes (ธีมเนื้อหา)\n- Platform-Specific Approach (แนวทางเฉพาะแพลตฟอร์ม)\n- Content Examples (ตัวอย่างเนื้อหา)\n\n### 5. Channel Strategy (กลยุทธ์ช่องทาง)\n- Channel Mix (ส่วนผสมช่องทาง)\n- Platform-Specific Tactics (กลยุทธ์เฉพาะแพลตฟอร์ม)\n- Posting Schedule (กำหนดการโพสต์)\n\n### 6. PR Strategy (กลยุทธ์ประชาสัมพันธ์)\n- Media Outreach (การติดต่อสื่อ)\n- Event Planning (การวางแผนกิจกรรม)\n- Press Materials (สื่อประชาสัมพันธ์)\n\n### 7. Budget Allocation (การจัดสรรงบประมาณ)\n- Cost Breakdown (การแบ่งต้นทุน)\n- ROI Projections (การคาดการณ์ผลตอบแทนจากการลงทุน)\n\n### 8. Implementation Roadmap (แผนการดำเนินงาน)\n- Timeline (กำหนดเวลา)\n- Key Milestones (เหตุการณ์สำคัญ)\n- Team Responsibilities (ความรับผิดชอบของทีม)\n\n### 9. Success Metrics (ตัวชี้วัดความสำเร็จ)\n- KPIs (ตัวชี้วัดผลการดำเนินงานหลัก)\n- Measurement Methodology (วิธีการวัดผล)\n\n## Formatting Guidelines\n\n1. Use clear, professional language appropriate for marketing executives\n2. Include section headers and subheaders for easy navigation\n3. Use bullet points for lists and key information\n4. Highlight important data points and insights\n5. Maintain consistent formatting throughout the document\n6. Ensure all content is properly translated to the user's language\n7. Preserve brand names, product names, and technical terms in their original form\n\n## Translation Guidelines\n\n1. Detect the language from the raw_query field\n2. Translate all section headers, content, and descriptions to match that language\n3. Maintain the meaning and tone of the original content\n4. Preserve technical terms, brand names, and product names in their original form\n5. Ensure culturally appropriate translations for marketing terminology\n6. If the language uses non-Latin characters, include both the translated term and the English term in parentheses for key marketing concepts\n\nRemember, you are the final touchpoint between the AI marketing system and the user. Your summary should provide a comprehensive overview of the entire campaign in a format that is easy to understand and actionable for the user.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        4640,
+        220
+      ],
+      "id": "d9c68c2c-7201-4c21-bae4-271c1dd2425d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        4580,
+        440
+      ],
+      "id": "2e9583e7-6956-46e5-8324-3a9c8ffcdef3",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "Ii6IZFZP8k1AKMc0",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "line-webhook",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1260,
+        340
+      ],
+      "id": "d09c8374-eef4-4513-83eb-f23832b7f720",
+      "name": "Webhook",
+      "webhookId": "1f8fac6f-f3af-422b-a4c1-94517cf5510f"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"replyToken\": \"{{ $('Input').item.json.reply_token }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{{ $json.output.replace(/(?:\\r\\n|\\r|\\n)/g, '\\\\n') }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "7ec70a4a-3db7-4d63-9ce7-23d52a9b85ac",
+      "name": "Line : Reply with token",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        5480,
+        240
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "XICeq6xANAtonvGm",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ce6612c2-c5c8-43a6-b992-6c02508d7a14",
+              "name": "chat",
+              "value": "={{ $('Webhook').item.json.body.events.first().message.text}}",
+              "type": "string"
+            },
+            {
+              "id": "3d67885c-da07-43ba-a1e6-36311808595c",
+              "name": "reply_token",
+              "value": "={{ $('Webhook').item.json.body.events.first().replyToken}}",
+              "type": "string"
+            },
+            {
+              "id": "e4219609-a36a-4c72-97ab-17bd6b56d270",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1020,
+        300
+      ],
+      "id": "1b6d9603-e330-4d73-9cf6-65de1a320edd",
+      "name": "Input"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d2cfaa7b-9053-4c9d-99c8-98a17165175b",
+              "leftValue": "={{ $json.chat }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -800,
+        300
+      ],
+      "id": "7cf9b204-a5e8-4835-8ff6-cfdea68cae7d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"replyToken\": \"{{ $('Webhook').item.json.body.events[0].replyToken }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"กรุณาพิมพ์ข้อมูลที่ต้องการสอบถาม\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "b345ac7d-6f4f-4ec6-ad89-2b2e310d4f73",
+      "name": "Line : Reply with token1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -300,
+        540
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "XICeq6xANAtonvGm",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d75b9adb-61f6-45ad-9b88-4f2a7e383cf2",
+              "leftValue": "={{ $('Webhook').item.json.body.events[0].replyToken }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -600,
+        660
+      ],
+      "id": "53f4ab85-3d08-4c3f-9981-94f2470a0226",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"message\": \"hello\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -400,
+        700
+      ],
+      "id": "ac12dd0e-c4ba-443b-a403-ee2328a981b6",
+      "name": "Output"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nconst aiOutput = $('AI Agent').first().json.output.replaceAll(\"\\\"\",\"\\\\\\\"\");\n\nconst driveUrlId = $('Search Folder').first().json.id\n\nconst driveUrl = `https://drive.google.com/drive/folders/${driveUrlId}`\n\nreturn {\n  output: aiOutput + '\\n\\n' + `ดูเอกสารเพิ่มเติมได้ที่ ${driveUrl}`\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5140,
+        220
+      ],
+      "id": "1ad30205-a308-4a2f-a02d-d3d5ad32269b",
+      "name": "Transfrom Output"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        3280,
+        420
+      ],
+      "id": "1c935c9c-8171-4716-b6be-cee241e41d99",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "Ii6IZFZP8k1AKMc0",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "headerRow": true
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        4040,
+        200
+      ],
+      "id": "7d0bc049-f4bc-4b72-bad9-fe3cd5744163",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "name": "=Task Planning_{{$now.format('yyyy-MM-dd')}}",
+        "driveId": {
+          "__rl": true,
+          "value": "={{ $('Search Folder').item.json.id }}",
+          "mode": "id"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4320,
+        200
+      ],
+      "id": "d1107f7d-cdeb-4bb9-97bc-56b736bcb86e",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "hu9687crjhDYNqfs",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Raw query: \n{{ $('Input').item.json.chat }}\n\n------------------------------\n\nINPUT: \n{{ $('Merge3').item.json.toJsonString() }}",
+        "options": {
+          "systemMessage": "=# Planning Agent System Prompt\n\n## OVERVIEW\n\nYou are a Planning Agent, a specialized AI designed to create detailed project timelines and task assignments for marketing campaigns. Your role is to analyze the outputs from various specialized marketing agents and create a comprehensive, actionable project plan in a JSON format. You must output ONLY the JSON data without any additional text, explanations, or headers.\n\n## LANGUAGE HANDLING\n\n1. Detect the language from the raw_query\n2. Respond in the same language as the raw_query\n3. If translating to a non-English language, maintain brand names, product names, and technical terms in their original form\n\n## INPUT\n\nYou will receive the following inputs:\n\n1. **raw_query**: The original user request\n2. **campaign_objectives**: Strategic goals, target audience, and key messaging from the Marketing Manager\n3. **creative_concepts**: Brand positioning, visual identity, and creative direction from the Creative Director\n4. **design_assets**: Visual mockups, color palette, typography, and layout guidelines from the Graphic Designer\n5. **content_ideas**: Content themes, platform-specific content, and posting schedules from the Content Creator\n6. **social_media_content**: Platform strategies, content calendars, and engagement tactics from the Social Media Manager\n7. **pr_strategy**: Media outreach, press releases, and event planning from the PR Agent\n\n## PROCESS\n\n1. Analyze all inputs to identify key tasks required for the marketing campaign\n2. Determine which specialized agent should be responsible for each task\n3. Create a logical sequence of tasks with appropriate dependencies\n4. Assign realistic start and due dates based on the campaign timeline\n5. Format the plan as a clean JSON with no additional text\n\n## OUTPUT\n\nCreate a comprehensive project plan in JSON format with the following Thai keys:\n\n1. **ตัวแทน**: The specialized agent responsible for the task (Marketing Manager, Creative Director, Graphic Designer, Content Creator, Social Media & PR Agent)\n2. **งาน**: A clear, specific task description\n3. **วันที่เริ่ม**: When the task should begin (format according to the user's language/region)\n4. **วันที่ครบกำหนด**: When the task should be completed (format according to the user's language/region)\n5. **สถานะ**: The current status of the task (e.g., \"ยังไม่เริ่ม\", \"กำลังดำเนินการ\", \"เสร็จสิ้น\")\n\nIMPORTANT: Your response must contain ONLY the raw JSON data with no additional text, explanations, or headers before or after the JSON. Do not include any introduction, conclusion, or explanatory text. Your response should be a valid JSON array of objects, with each object representing a task.\n\nCRITICAL: DO NOT include ```json or ``` markdown code block indicators around your JSON output. The output must be the raw JSON only, with no markdown formatting whatsoever.\n\nThe JSON should be formatted as follows (note that this example is showing the structure, but your actual output should NOT include the ```json markers):\n\n[\n  {\n    \"ตัวแทน\": \"[Agent Name]\",\n    \"งาน\": \"[Task Description]\",\n    \"วันที่เริ่ม\": \"[Start Date]\",\n    \"วันที่ครบกำหนด\": \"[Due Date]\",\n    \"สถานะ\": \"[Status]\"\n  }\n]\n\n## GUIDELINES\n\n1. **Timeline Calculation**:\n   - Calculate dates based on the campaign launch date provided in the input\n   - Work backward from the launch date to ensure all tasks are completed on time\n   - Allow appropriate time for review and revisions\n\n2. **Task Assignment**:\n   - Assign tasks to the appropriate specialized agent based on their expertise\n   - Ensure no agent is overloaded with too many simultaneous tasks\n   - Consider dependencies between tasks (e.g., design assets must be created before content)\n\n3. **Task Specificity**:\n   - Make tasks specific, measurable, and actionable\n   - Break down complex activities into smaller, manageable tasks\n   - Include review and approval steps for key deliverables\n\n4. **Status Assignment**:\n   - Assign appropriate status based on the current date and task dates\n   - Tasks with start dates in the future should be \"ยังไม่เริ่ม\" (Not Started)\n   - Tasks with start dates in the past but due dates in the future should be \"กำลังดำเนินการ\" (In Progress)\n   - Tasks with due dates in the past should be \"เสร็จสิ้น\" (Completed)\n\n5. **Formatting**:\n   - Present ONLY the JSON data with no additional text\n   - Use consistent date formatting appropriate to the user's language/region\n   - Ensure proper JSON formatting with correct syntax\n   - Always use Thai keys: \"ตัวแทน\", \"งาน\", \"วันที่เริ่ม\", \"วันที่ครบกำหนด\", \"สถานะ\"\n   - DO NOT include ```json or ``` markdown code block indicators around your output\n\n6. **Language Adaptation**:\n   - Translate all task descriptions, dates, and statuses to match the user's language\n   - For Thai language, use appropriate Thai date formatting (e.g., \"15 มีนาคม 2568\")\n   - For other languages, adapt date formats accordingly, but always keep the keys in Thai\n\nToday's date is {{ $now }}.\n\n## EXAMPLE OUTPUT\n\nFor an English query about a product launching on May 15, 2025, your entire response should be exactly (without any ```json or ``` markers):\n\n[\n  {\n    \"ตัวแทน\": \"Marketing Manager\",\n    \"งาน\": \"Define campaign objectives and target audience\",\n    \"วันที่เริ่ม\": \"March 20 2025\",\n    \"วันที่ครบกำหนด\": \"March 25 2025\",\n    \"สถานะ\": \"Not Started\"\n  },\n  {\n    \"ตัวแทน\": \"Creative Director\",\n    \"งาน\": \"Develop creative concept and brand positioning\",\n    \"วันที่เริ่ม\": \"March 26 2025\",\n    \"วันที่ครบกำหนด\": \"April 1 2025\",\n    \"สถานะ\": \"Not Started\"\n  },\n  {\n    \"ตัวแทน\": \"Graphic Designer\",\n    \"งาน\": \"Create visual mockups for Instagram campaign\",\n    \"วันที่เริ่ม\": \"April 2 2025\",\n    \"วันที่ครบกำหนด\": \"April 10 2025\",\n    \"สถานะ\": \"Not Started\"\n  },\n  {\n    \"ตัวแทน\": \"Content Creator\",\n    \"งาน\": \"Develop content calendar for social media\",\n    \"วันที่เริ่ม\": \"April 11 2025\",\n    \"วันที่ครบกำหนด\": \"April 18 2025\",\n    \"สถานะ\": \"Not Started\"\n  },\n  {\n    \"ตัวแทน\": \"Social & PR Agent\",\n    \"งาน\": \"Schedule and launch Instagram campaign\",\n    \"วันที่เริ่ม\": \"April 19 2025\",\n    \"วันที่ครบกำหนด\": \"May 15 2025\",\n    \"สถานะ\": \"Not Started\"\n  }\n]\n\nFor a Thai query about a product launching on May 15, 2025, your entire response should be exactly (without any ```json or ``` markers):\n\n[\n  {\n    \"ตัวแทน\": \"ผู้จัดการการตลาด\",\n    \"งาน\": \"กำหนดวัตถุประสงค์แคมเปญและกลุ่มเป้าหมาย\",\n    \"วันที่เริ่ม\": \"20 มีนาคม 2568\",\n    \"วันที่ครบกำหนด\": \"25 มีนาคม 2568\",\n    \"สถานะ\": \"ยังไม่เริ่ม\"\n  },\n  {\n    \"ตัวแทน\": \"ผู้อำนวยการครีเอทีฟ\",\n    \"งาน\": \"พัฒนาแนวคิดสร้างสรรค์และการวางตำแหน่งแบรนด์\",\n    \"วันที่เริ่ม\": \"26 มีนาคม 2568\",\n    \"วันที่ครบกำหนด\": \"1 เมษายน 2568\",\n    \"สถานะ\": \"ยังไม่เริ่ม\"\n  },\n  {\n    \"ตัวแทน\": \"นักออกแบบกราฟิก\",\n    \"งาน\": \"สร้างภาพจำลองสำหรับแคมเปญ Instagram\",\n    \"วันที่เริ่ม\": \"2 เมษายน 2568\",\n    \"วันที่ครบกำหนด\": \"10 เมษายน 2568\",\n    \"สถานะ\": \"ยังไม่เริ่ม\"\n  },\n  {\n    \"ตัวแทน\": \"ผู้สร้างเนื้อหา\",\n    \"งาน\": \"พัฒนาปฏิทินเนื้อหาสำหรับโซเชียลมีเดีย\",\n    \"วันที่เริ่ม\": \"11 เมษายน 2568\",\n    \"วันที่ครบกำหนด\": \"18 เมษายน 2568\",\n    \"สถานะ\": \"ยังไม่เริ่ม\"\n  },\n  {\n    \"ตัวแทน\": \"ตัวแทนโซเชียลและประชาสัมพันธ์\",\n    \"งาน\": \"กำหนดเวลาและเปิดตัวแคมเปญ Instagram\",\n    \"วันที่เริ่ม\": \"19 เมษายน 2568\",\n    \"วันที่ครบกำหนด\": \"15 พฤษภาคม 2568\",\n    \"สถานะ\": \"ยังไม่เริ่ม\"\n  }\n]"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        3340,
+        200
+      ],
+      "id": "e9bbd5b4-784c-4456-bbef-0de30d6a3bdd",
+      "name": "Task Planing Agent"
+    },
+    {
+      "parameters": {
+        "jsCode": "return JSON.parse($input.first().json.output)"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3780,
+        200
+      ],
+      "id": "f52f2674-e178-4d7d-9ad2-104417bf2b24",
+      "name": "Code"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Campaign Orchestrator Agent": {
+      "main": [
+        [
+          {
+            "node": "Set Field",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Raw Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Campaign Orchestrator Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marketing Manager Agent": {
+      "main": [
+        [
+          {
+            "node": "Creative Director Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Creative Director Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Graphic Designer Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Graphic Designer Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Content Creator Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Content Creator Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Raw Query": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Set Field": {
+      "main": [
+        [
+          {
+            "node": "Marketing Manager Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Social And Pr Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Social And Pr Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Folder": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Task Planing Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "Search Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Transfrom Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Campaign Orchestrator Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Line : Reply with token1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transfrom Output": {
+      "main": [
+        [
+          {
+            "node": "Line : Reply with token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Task Planing Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Task Planing Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "89b7f52e-fd0e-44a4-b80b-036d0fad462b",
+  "meta": {
+    "instanceId": "c243a25c66c9d2221562262d20b9640bb0c5e364279a173041d7d943004a91e1"
+  },
+  "id": "5SwzjvrkCawr7ekF",
+  "tags": []
+}
